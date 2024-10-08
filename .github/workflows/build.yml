@@ -21,6 +21,9 @@ jobs:
         # target_arch: [x86_64, x86, arm64-v8a, armeabi-v7a]
         target_arch: [arm64-v8a]
       fail-fast: false
+    env:
+      ROOT: ${{github.workspace}}
+      PROTOBUF: ${{github.workspace}}/src/protobuf/build/protoc
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -33,7 +36,6 @@ jobs:
 
       - name: Build protobuf
         run: |
-          PROTOBUF="${ROOT}/src/protobuf/build/protoc"
           if ! test -f "${PROTOBUF}"; then
               # patch -up1 <"${ROOT}/patches/proto/Resources.proto.patch"
               # patch -up1 <"${ROOT}/patches/proto/ResourcesInternal.proto.patch"
