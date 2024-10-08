@@ -41,14 +41,8 @@ jobs:
       - name: Build protobuf
         run: |
           if ! test -f "${PROTOBUF}"; then
-              # patch -up1 <"${ROOT}/patches/proto/Resources.proto.patch"
-              # patch -up1 <"${ROOT}/patches/proto/ResourcesInternal.proto.patch"
-              # cd src/protobuf
-              # git reset --hard
-              # git clean -xdf
-              # patch -u <"${ROOT}/patches/protobuf_CMakeLists.txt.patch"
-
               # https://github.com/lzhiyong/android-sdk-tools/issues/39#issuecomment-2298867750
+              patch -up1 <"${ROOT}/patches/protobuf_CMakeLists.txt.patch"
               BUILD=${ROOT}/src/protobuf/build
               rm -rf "${BUILD}" && mkdir -p "${BUILD}"
 
