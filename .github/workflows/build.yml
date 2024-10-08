@@ -1,0 +1,68 @@
+name: Build aapt2
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  workflow_dispatch:
+    inputs:
+      tag:
+       description: 'specific branches or tags'
+       required: true
+       default: 'platform-tools-35.0.2'
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # target_arch: [x86_64, x86, arm64-v8a, armeabi-v7a]
+        target_arch: [arm64-v8a]
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+
+      - name: Get source
+        run: |
+          python get_source.py --tags ${{inputs.tag}}
+
+      - name: Build protobuf
+        run: |
+          PROTOBUF="${ROOT}/src/protobuf/build/protoc"
+          if ! test -f "${PROTOBUF}"; then
+              # patch -up1 <"${ROOT}/patches/proto/Resources.proto.patch"
+              # patch -up1 <"${ROOT}/patches/proto/ResourcesInternal.proto.patch"
+              # cd src/protobuf
+              # git reset --hard
+              # git clean -xdf
+              # patch -u <"${ROOT}/patches/protobuf_CMakeLists.txt.patch"
+          
+              # https://github.com/lzhiyong/android-sdk-tools/issues/39#issuecomment-2298867750
+              BUILD=${ROOT}/src/protobuf/build
+              rm -rf "${BUILD}" && mkdir -p "${BUILD}"
+          
+              # skip the googletest
+              cmake -S"${ROOT}/src/protobuf" -B"${BUILD}" -GNinja -Dprotobuf_BUILD_TESTS=OFF
+          
+              # building the protoc-xxx executable file
+              ninja -C "${BUILD}" -j"$(nproc --all)"
+          fi
+      - name: Build aapt2
+        run: |
+          python build.py \
+            --ndk="${ANDROID_NDK_ROOT}" \
+            --abi=arm64-v8a \
+            --build=build/aarch64 \
+            --protoc="${PROTOBUF}" \
+            --target=aapt2
+
+      # - name: Upload artifacts
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: dist-${{ matrix.target_arch }}
+      #     path: dist
