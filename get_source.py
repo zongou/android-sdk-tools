@@ -66,7 +66,7 @@ def patches():
     subprocess.run("sed -i {} {}".format(pattern2, Path.cwd() / "src/base/tools/aapt2/ApkInfo.proto"), shell=True)
     subprocess.run("sed -i {} {}".format(pattern, Path.cwd() / "src/base/tools/aapt2/Resources.proto"), shell=True)
     subprocess.run("sed -i {} {}".format(pattern, Path.cwd() / "src/base/tools/aapt2/ResourcesInternal.proto"), shell=True)
-    
+    subprocess.run("sed -i {} {}".format(pattern2, Path.cwd() / "src/base/tools/aapt2/ResourcesInternal.proto"), shell=True)
     
     pattern3 = "\'s/\/usr\/src\/googletest/\$\{CMAKE_SOURCE_DIR\}\/src\/googletest/g\'"
     subprocess.run("sed -i {} {}".format(pattern3, Path.cwd() / "src/abseil-cpp/CMakeLists.txt"), shell=True)
